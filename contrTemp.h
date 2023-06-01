@@ -14,12 +14,12 @@ void kontr_temp()
   Sensor::searchCodeSennsorInEEPROM(ds18b20EEprom, ds18b20);//Записуємо температуру в EEPROM sensory з реальних датчиків
 
 
-  Serial.print("nameSensor ");
-  Serial.print(ds18b20EEprom[0].nameSensor);
-  Serial.print(" strAddress ");
-  Serial.print(ds18b20EEprom[0].strAddress);
-  Serial.print(" temp  ");
-  Serial.println(ds18b20EEprom[0].temp);
+//  Serial.print("nameSensor ");
+//  Serial.print(ds18b20EEprom[0].nameSensor);
+//  Serial.print(" strAddress ");
+//  Serial.print(ds18b20EEprom[0].strAddress);
+//  Serial.print(" temp  ");
+//  Serial.println(ds18b20EEprom[0].temp);
 
   byte  stanRele = 0;
   //  Serial.println();
@@ -28,10 +28,10 @@ void kontr_temp()
   {
     if (releControl[numberRele].manualAuto == 0) {
       //Якщо неручний режим
-      Serial.print(" AUTOMATIC  ");
-      Serial.println(releControl[numberRele].manualAuto);
-      Serial.print(" releControl[numberRele].numberSensorControl  ");
-      Serial.println(releControl[numberRele].numberSensorControl);
+//      Serial.print(" AUTOMATIC  ");
+//      Serial.println(releControl[numberRele].manualAuto);
+//      Serial.print(" releControl[numberRele].numberSensorControl  ");
+//      Serial.println(releControl[numberRele].numberSensorControl);
       //            Serial.println("*********************************************************");
       //            Serial.println(" AUTO ");
 
@@ -51,15 +51,15 @@ void kontr_temp()
         //Превірка чи підключений термодатчик яким управляємо реле, що записаний в памяті EEPROM
 
         boolean flag = true;
-        for (int k = 0; k < deviceCountSensor; k++) {
+        for (int k = 0; k < Sensor::deviceCountSensor; k++) {
 
           if (ds18b20EEprom[releControl[numberRele].numberSensorControl].strAddress == ds18b20[k].strAddress) { //Найдено сенсор який є в памяті EEPROM
-            Serial.print("Kontrol sensor rele ");
-            Serial.println(numberRele);
+//            Serial.print("Kontrol sensor rele ");
+//            Serial.println(numberRele);
             releControl[numberRele].errorSensor = false;
-            prin("ds18b20[k].temp", ds18b20[k].temp);
-            prin("ds18b20[numberRele].tempVkl", ds18b20[numberRele].tempVkl);
-            prin("ds18b20[numberRele].tempOtkl", ds18b20[numberRele].tempOtkl);
+            //prin("ds18b20[k].temp", ds18b20[k].temp);
+            //prin("ds18b20[numberRele].tempVkl", ds18b20[numberRele].tempVkl);
+            //prin("ds18b20[numberRele].tempOtkl", ds18b20[numberRele].tempOtkl);
             if (releControl[numberRele].bit4OneOrTwoRange == 0) {//Один діапазон
               if (ds18b20[k].temp > ds18b20[numberRele].tempVkl)
               {
@@ -75,11 +75,11 @@ void kontr_temp()
                 releControl[numberRele].flagsTermo = false;
               }
             }
-            prin("releControl[numberRele].flagsTermo contr Temp 81", releControl[numberRele].flagsTermo);
+            //prin("releControl[numberRele].flagsTermo contr Temp 81", releControl[numberRele].flagsTermo);
             break;
           } else {
-            Serial.print("NOT SENSOR ");
-            Serial.println(numberRele);
+//            Serial.print("NOT SENSOR ");
+//            Serial.println(numberRele);
             releControl[numberRele].errorSensor = true;
           }
 
@@ -164,7 +164,7 @@ void kontr_temp()
           dataAndTime[numberRele].godyna[20] < 24 || dataAndTime[numberRele].godyna[30] < 24 ||
           dataAndTime[numberRele].godyna[40] < 24) {
         releControl[numberRele].timerControl = 1;
-        Serial.println("TIMER CONTROL GLOBAL ++++");
+//        Serial.println("TIMER CONTROL GLOBAL ++++");
       } else {
         releControl[numberRele].timerControl = 0;
         //        Serial.println("TIMER CONTROL GLOBAL ----");
@@ -181,10 +181,10 @@ void kontr_temp()
       //********************CONTROL FLAGS*******************************
       if (releControl[numberRele].numberSensorControl < 15 && releControl[numberRele].timerControl == 1)   //Якщо реле регул двома
       {
-        Serial.println("CONTROL  TIME AND SENSOR::::::::::::  ");
-        Serial.println("numberSensorControl::::::::::::  ");
-        Serial.println(releControl[numberRele].numberSensorControl);
-        Serial.println("CONTROL  TIME AND SENSOR::::::::::::  ");
+//        Serial.println("CONTROL  TIME AND SENSOR::::::::::::  ");
+//        Serial.println("numberSensorControl::::::::::::  ");
+//        Serial.println(releControl[numberRele].numberSensorControl);
+//        Serial.println("CONTROL  TIME AND SENSOR::::::::::::  ");
 
         if (!releControl[numberRele].errorSensor  && connectedInternet) {// Якщо датчик присутній  і є година з інтернету
           if (releControl[numberRele].flagsTermo &&  releControl[numberRele].flagsTimer) {
@@ -200,7 +200,7 @@ void kontr_temp()
         }
 
       } else if (releControl[numberRele].numberSensorControl < 15) {   //Якщо реле регул termo
-        Serial.println("CONTROL  SENSOR ::::::::::::  ");
+//        Serial.println("CONTROL  SENSOR ::::::::::::  ");
 
         if (!releControl[numberRele].errorSensor) {// Якщо датчик присутній
           if (releControl[numberRele].flagsTermo) {
@@ -217,7 +217,7 @@ void kontr_temp()
       } else if (releControl[numberRele].timerControl == 1) {   //Якщо реле регул timer
 
         if (connectedInternet) {// Якщо є година з інтернету
-          Serial.println("CONTROL  TIME ::::::::::::  ");
+//          Serial.println("CONTROL  TIME ::::::::::::  ");
           if (releControl[numberRele].flagsTimer) {
             digitalWrite(releControl[numberRele].numberPin, ChangeLow);
           } else {
@@ -231,7 +231,7 @@ void kontr_temp()
         }
 
       } else { //Якщо реле нічого не регулює то ми його відключаємо
-        Serial.println("NOT CONTROL RELE ::::::::::::  ");
+//        Serial.println("NOT CONTROL RELE ::::::::::::  ");
         digitalWrite(releControl[numberRele].numberPin, 1);
       }
       //********************CONTROL FLAGS*******************************
@@ -256,7 +256,7 @@ void kontr_temp()
   //  Serial.println();
   //Відправляємо стани всіх реле
 //  client.publish(nameUser + "_stanRele", String(stanRele));
-  Rele::sendStanRele(releControl);
+  Rele::sendStanReleOnOff(releControl);
   client.publish(nameUser + "analogInputA0", String(analogRead(A0)));
   //  Serial.print(" stanRele>>>>>>>>>>>><<<<<<<<<<<  ");
   //  Serial.println(stanRele, BIN);

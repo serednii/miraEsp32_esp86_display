@@ -9,6 +9,8 @@ class Eeprom {
   public:
     static void comitEprom()
     {
+           Serial.print("EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT**********************: ");
+  Serial.println(EEPROM.read(EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT));
       if (EEPROM.commit())
       {
         Serial.println("EEPROM successfully committed");
@@ -17,6 +19,8 @@ class Eeprom {
       {
         Serial.println("ERROR! EEPROM commit failed");
       }
+           Serial.print("EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT**************************: ");
+  Serial.println(EEPROM.read(EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT));
     }
     //*************************************************************************************************************************************************
 
@@ -98,23 +102,10 @@ static void readEeprom()
 }
 //*******************READ EEPROM****************************
 
-};
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //*************************************************************************************************************************************************
-void writeStringEeprom(word beginByteEeprom, word maxLengthString, String str, word symbol ) {
+static void writeStringEeprom(word beginByteEeprom, word maxLengthString, String str, word symbol ) {
   //beginByteEeprom Початковий адресс
   //maxLengthString Виділена память під строку
   //str строка
@@ -136,9 +127,10 @@ void writeStringEeprom(word beginByteEeprom, word maxLengthString, String str, w
 }
 //*************************************************************************************************************************************************
 
+
 //*************************************************************************************************************************************************
 //read eeprom string Читає с EEPROM строку певної довжини
-String readStringEeprom(int beginByteEeprom, int lengthString ) {
+static String readStringEeprom(int beginByteEeprom, int lengthString ) {
   String tempString;
   for (int i = 0; i < lengthString; i++)
   {
@@ -149,3 +141,5 @@ String readStringEeprom(int beginByteEeprom, int lengthString ) {
   return tempString;
 }
 //*************************************************************************************************************************************************
+
+};

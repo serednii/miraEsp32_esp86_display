@@ -96,7 +96,6 @@ void prinString(String s) {
 }
 void prin(String s) {
   if(FLAGPRINT)Serial.println(s);
-
 }
 
 //**********************************************************************************************

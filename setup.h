@@ -10,40 +10,38 @@ void setup()
 #else
   Serial.begin(500000);
 #endif
+
+ 
+  EEPROM.begin(4096);
+  prinEEPROMDebag(START_SECTION_EEPROM_SENSOR_ADDRESS, LENGTH_SECTION_EEPROM_SENSOR_ADDRESS, "START_SECTION_EEPROM_SENSOR_ADDRESS");
+  delay(1000);
+
   lcd.begin();
   lcd.clear();
   lcd.backlight();      // Make sure backlight is on
-
   // Print a message on both lines of the LCD.
   lcd.setCursor(2, 0);  //Set cursor to character 2 on line 0
   lcd.print("Hello world!");
-
   lcd.setCursor(2, 1);  //Move cursor to character 2 on line 1
   lcd.print("LCD Tutorial");
-  sensors.begin();
-  delay(1000);
-  EEPROM.begin(4096);
+
+
+
 
   //  EEPROM.write(EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT, 0);
-  //    for (int i = 1; i < 4096; i++) {
-  //        EEPROM.write(i, 0);
-  //      }
+  //      for (int i = 1; i < 4096; i++) {
+  //          EEPROM.write(i, 0);
+  //        }
+  //  Eeprom::comitEprom();
 
-  releControl[0].numberPin = PIN_RELE_0;
-  releControl[1].numberPin = PIN_RELE_1;
-  releControl[2].numberPin = PIN_RELE_2;
-  releControl[3].numberPin = PIN_RELE_3;
-  releControl[4].numberPin = PIN_RELE_4;
-  releControl[5].numberPin = PIN_RELE_5;
-  releControl[6].numberPin = PIN_RELE_6;
-  releControl[7].numberPin = PIN_RELE_7;
 
-  for (int i = 0; i < NUMBER_RELE; i++) {
-    pinMode(releControl[i].numberPin, OUTPUT);
-    digitalWrite(releControl[i].numberPin, HIGH);
-  }
+  TimerDate::readTimerEEPROMToObjeckt(dataAndTime);
+  printObjectTime();
+  prin("TOTAL_LENGTH_SECTION_900", TOTAL_LENGTH_SECTION_END);
+
 
 #ifdef ESP32
+  //Настройка входів 
   pinMode(PIN_RELE_IN_0, INPUT);
   pinMode(PIN_RELE_IN_1, INPUT);
   pinMode(PIN_RELE_IN_2, INPUT);
@@ -52,16 +50,30 @@ void setup()
   pinMode(PIN_RELE_IN_5, INPUT);
   pinMode(PIN_RELE_IN_6, INPUT);
   pinMode(PIN_RELE_IN_7, INPUT);
+   //Настройка виходів 
+  releControl[0].numberPin = PIN_RELE_OUT_0;
+  releControl[1].numberPin = PIN_RELE_OUT_1;
+  releControl[2].numberPin = PIN_RELE_OUT_2;
+  releControl[3].numberPin = PIN_RELE_OUT_3;
+  releControl[4].numberPin = PIN_RELE_OUT_4;
+  releControl[5].numberPin = PIN_RELE_OUT_5;
+  releControl[6].numberPin = PIN_RELE_OUT_6;
+  releControl[7].numberPin = PIN_RELE_OUT_7;
+
+  for (int i = 0; i < NUMBER_RELE; i++) {
+    pinMode(releControl[i].numberPin, OUTPUT);
+    digitalWrite(releControl[i].numberPin, HIGH);
+  }
 #endif
 
   pinMode(PIN_LED_KONTROL, OUTPUT);
   digitalWrite(PIN_LED_KONTROL, HIGH);
 
-  prinEEPROMDebag(EEPROM_ADRESS_STRING_NAME_DEVICE, 1, "EEPROM_ADRESS_STRING_NAME_DEVICE");
-  prinEEPROMDebag(START_SECTION_EEPROM_SSID_AND_PASSWORD, LENGTH_SECTION_SSID_ADN_PASSWORD, "START_SECTION_EEPROM_SSID_AND_PASSWORD");
-  prinEEPROMDebag(START_SECTION_RELE_EEPROM_SENSOR, LENGTH_RELE_EEPROM_SENSOR, "START_SECTION_RELE_EEPROM_SENSOR");
-  prinEEPROMDebag(START_SECTION_RELE_EEPROM_UPR, LENGTH_RELE_EEPROM_UPR, "START_SECTION_RELE_EEPROM_UPR");
-  prinEEPROMDebag(START_SECTION_EEPROM_TEMP_ON_OFF, LENGTH_TEMP_ON_OFF, "START_SECTION_EEPROM_TEMP_ON_OFF");
+  //  prinEEPROMDebag(EEPROM_ADRESS_STRING_NAME_DEVICE, 1, "EEPROM_ADRESS_STRING_NAME_DEVICE");
+  //  prinEEPROMDebag(START_SECTION_EEPROM_SSID_AND_PASSWORD, LENGTH_SECTION_SSID_ADN_PASSWORD, "START_SECTION_EEPROM_SSID_AND_PASSWORD");
+  //  prinEEPROMDebag(START_SECTION_RELE_EEPROM_SENSOR, LENGTH_RELE_EEPROM_SENSOR, "START_SECTION_RELE_EEPROM_SENSOR");
+  //  prinEEPROMDebag(START_SECTION_RELE_EEPROM_FLAGS, LENGTH_RELE_EEPROM_FLAGS, "START_SECTION_RELE_EEPROM_FLAGS");
+  //  prinEEPROMDebag(START_SECTION_EEPROM_TEMP_ON_OFF, LENGTH_TEMP_ON_OFF, "START_SECTION_EEPROM_TEMP_ON_OFF");
 
   refreshData();
 
@@ -126,34 +138,34 @@ void setup()
 
 
 
-        Eeprom::readEeprom();
-        char Buf[20];
-        char Buf1[20];
-        digitalWrite(PIN_LED_KONTROL, LOW);
-        // Register multi WiFi networks
-        for (int i = 0; i < 6; i++)
-        {
-          arraySsid[i].toCharArray(Buf, 20);
-          arrayPassword[i].toCharArray(Buf1, 20);
-          wifiMulti.addAP(Buf, Buf1);
-    
-          Serial.print("ssid: ");
-          Serial.print(i);
-          Serial.print("  ");
-          Serial.print(Buf);
-    
-          Serial.print("pasword: ");
-          Serial.print(i);
-          Serial.print("  ");
-          Serial.print(Buf1);
-        }
+    Eeprom::readEeprom();
+    char Buf[20];
+    char Buf1[20];
+    digitalWrite(PIN_LED_KONTROL, LOW);
+    // Register multi WiFi networks
+    for (int i = 0; i < 6; i++)
+    {
+      arraySsid[i].toCharArray(Buf, 20);
+      arrayPassword[i].toCharArray(Buf1, 20);
+      wifiMulti.addAP(Buf, Buf1);
+
+      Serial.print("ssid: ");
+      Serial.print(i);
+      Serial.print("  ");
+      Serial.print(Buf);
+
+      Serial.print("pasword: ");
+      Serial.print(i);
+      Serial.print("  ");
+      Serial.print(Buf1);
+    }
 
     byte counterConnect = 0;
     while (wifiMulti.run(connectTimeoutMs) != WL_CONNECTED)
     {
       Serial.print("-3 ");
-     connectedInternet = true;
-      OtherFunction::ledBlink(5, 250);
+      connectedInternet = true;
+//      OtherFunction::ledBlink(5, 250);
       Serial.println("\n ESP8266 Multi WiFi example 22");
       kontr_temp();
       Serial.println("\n ESP8266 Multi WiFi example 33");
@@ -170,6 +182,7 @@ void setup()
       //      }
       counterAnalogInput += 650;
       analoReadA0();
+      OtherFunction::controlPins();
     }
 
     Serial.println("");

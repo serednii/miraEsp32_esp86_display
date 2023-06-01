@@ -29,7 +29,7 @@ class TimerDate {
     //    }
 
     //*************************************************************************************************************************************************
-    static String objectToJsonDateArray(TimerDate dataAndTime[]) {
+    static String objectToJsonDateArray(TimerDate dataAndTime[]) {//Відправляємо всі дати і години таймерів
       String json;
       DynamicJsonDocument doc(32000);
       const word NumberElementDate = 10;
@@ -60,14 +60,15 @@ class TimerDate {
       }
 
       serializeJson(doc, json);
-      prin("OUTPUT LENGTH", json.length());
-      prin("OUTPUT LENGTH", json);
+       doc.clear();
+//      prin("OUTPUT LENGTH", json.length());
+//      prin("OUTPUT LENGTH", json);
       return json;
     }
     //*************************************************************************************************************************************************
 
     //*************************************************************************************************************************************************
-    static String objectToJsonDate(TimerDate dataAndTime , byte num) {
+    static String objectToJsonDate(TimerDate dataAndTime , byte num) {//Відправляємо  дати і години таймерів для конкретного реле
       String json;
       DynamicJsonDocument doc(2000);
       const word NumberElementDate = 10;
@@ -88,15 +89,39 @@ class TimerDate {
       }
 
       serializeJson(doc, json);
-      //  prin("OUTPUT LENGTH", json.length());
-      //  prin("OUTPUT LENGTH", json);
+       doc.clear();
+      //  ////prin("OUTPUT LENGTH", json.length());
+      //  //prin("OUTPUT LENGTH", json);
       return json;
     }
     //*************************************************************************************************************************************************
 
+  public:
+    static void writeEepromObjectDataTimeSendBrouser(TimerDate dataAndTime[], String json) {
+      //prin("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS", json);
+
+      //{"RELE":3,
+      //"delaySecondStart":"0",
+      //"dataTime":[{"DM":1684002600,"Y":2023,"M":4,"D":13,"H":20,"MI":30,"T":6},{"DM":1684693800,"Y":2023,"M":4,"D":21,"H":20,"MI":30,"T":0},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"}],
+      //"Time":[{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"H":22,"MI":30},{"H":23,"MI":33},
+      //{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},
+      //{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},
+      //{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"}],
+      //"today":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]}
+
+      //{"rele":0,"default":"default"}//Очищаємо всі значення для таймерів
+
+      dataTimeJsonToObject(json,  dataAndTime);//Записуємо в  обєкт dataAndTime по індексу який приходить в строці json для конкретного реле
+      EEPROM.put(START_SECTION_EEPROM_TIMERDATE + (sizeof(TimerDate) * TimerDate::numberRele), dataAndTime[TimerDate::numberRele]); // write objeck to EEPROM
+      Eeprom::comitEprom();
+      TimerDate::readTimerEEPROMToObjeckt(dataAndTime);
+      client.publish(nameUser + "_esp_to_brouser_rele_data_time", TimerDate::objectToJsonDate(dataAndTime[TimerDate::numberRele], TimerDate::numberRele));
+    
+    }
+     
 
     //*************************************************************************************************************************************************
-    static  void dataTimeJsonToObject(String json, TimerDate dataAndTime[]) {
+    static  void dataTimeJsonToObject(String json, TimerDate dataAndTime[]) {//Записуємо в  обєкт dataAndTime по індексу який приходить в строці json для конкретного реле
       DynamicJsonDocument doc(2000);
       deserializeJson(doc, json);
       byte numberRele =  doc["rele"];
@@ -139,12 +164,12 @@ class TimerDate {
           dataAndTime[numberRele].dey[i] = 1;
         }
       }
-      printObjectTime();
+       doc.clear();
 
     }
     //*************************************************************************************************************************************************
 
-    
+
     //*************************************************************************************************************************************************
     static void readTimerEEPROMToObjeckt(TimerDate dataAndTime[]) { // Читаємо дані з памяті еепром в обєкт
       for (int i = 0; i < 8; i++) {
@@ -152,7 +177,7 @@ class TimerDate {
       }
     }
     //*************************************************************************************************************************************************
-    
+
 
     //*************************************************************************************************************************************************
   private:
@@ -195,6 +220,9 @@ class TimerDate {
     //  Eeprom::comitEprom();
     //}
     //*************************************************************************************************************************************************
+
+
+
 
 
 

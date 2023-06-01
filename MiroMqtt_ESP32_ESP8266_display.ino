@@ -23,17 +23,18 @@ LiquidCrystal_I2C lcd(0x26,20,4);  // set the LCD address to 0x3F for a 16 chars
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFiMulti.h>
+
 ESP8266WiFiMulti wifiMulti;
 
 const byte PIN_DS18B20 = 14;
-const byte PIN_RELE_0 = 5;
-const byte PIN_RELE_1 = 4;
-const byte PIN_RELE_2 = 0;
-const byte PIN_RELE_3 = 2;
-const byte PIN_RELE_4 = 12;
-const byte PIN_RELE_5 = 13;
-const byte PIN_RELE_6 = 0;//3
-const byte PIN_RELE_7 = 0;//1
+const byte PIN_RELE_OUT_0 = 5;
+const byte PIN_RELE_OUT_1 = 4;
+const byte PIN_RELE_OUT_2 = 0;
+const byte PIN_RELE_OUT_3 = 2;
+const byte PIN_RELE_OUT_4 = 12;
+const byte PIN_RELE_OUT_5 = 13;
+const byte PIN_RELE_OUT_6 = 0;//3
+const byte PIN_RELE_OUT_7 = 0;//1
 const byte PIN_LED_KONTROL = 16;
 int oneWireBus = PIN_DS18B20;
 byte inputAnalogPortADC1_0 = A0;
@@ -58,6 +59,7 @@ byte inputAnalogPortADC1_0 = A0;
 
 //ESP32
 #include <WiFi.h> 
+#include <HTTPClient.h>
 #include <WebServer.h>     
 #include <WiFiMulti.h>   
 WiFiMulti wifiMulti;             
@@ -67,14 +69,14 @@ const byte PIN_DS18B20 = 15;
 const byte PIN_sda = 21;//sda i2c display 2004 or 1602
 const byte PIN_scl = 22;//scl i2c display 2004 or 1602
 //Піжключаємо виходи реле
-const byte PIN_RELE_0 = 23;  
-const byte PIN_RELE_1 = 19;//12
-const byte PIN_RELE_2 = 18;
-const byte PIN_RELE_3 = 5;//19
-const byte PIN_RELE_4 = 17;//18
-const byte PIN_RELE_5 = 16;
-const byte PIN_RELE_6 = 4;//17
-const byte PIN_RELE_7 = 0;
+const byte PIN_RELE_OUT_0 = 23;  
+const byte PIN_RELE_OUT_1 = 19;//12
+const byte PIN_RELE_OUT_2 = 18;
+const byte PIN_RELE_OUT_3 = 5;//19
+const byte PIN_RELE_OUT_4 = 17;//18
+const byte PIN_RELE_OUT_5 = 16;
+const byte PIN_RELE_OUT_6 = 4;//17
+const byte PIN_RELE_OUT_7 = 0;
 
 //const byte PIN_RELE_8 = 1;//При відключеному UART
 //const byte PIN_RELE_8 = 2;
@@ -131,7 +133,6 @@ int counterPin_7 = 0;
 int oneWireBus = PIN_DS18B20;
 #endif
 
-
 #include <PubSubClient.h> //mqtt
 #include <EEPROM.h>
 #include <NTPClient.h>//Годинник
@@ -139,19 +140,14 @@ int oneWireBus = PIN_DS18B20;
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 7200 , 60000);
 
-
-
-
-
 //*****************************
-
 //  HH:MM:SS
 //******************************
 
 const String nameUser = "mykola";
 boolean connectedInternet = false;
 //#include <ArduinoJson.h>
-//DynamicJsonDocument doc(3400);
+
 // WiFi connect timeout per AP. Increase when connecting takes longer.
 const uint32_t connectTimeoutMs = 5000;
 
@@ -229,16 +225,16 @@ int counterAnalogInput = 0;
 String form1_2;
 //const int led = LED_BUILTIN;
 
-
 int symbolStart = 0;
 int symbolEnd = 0;
 
 #include "eeprom.h"
-#include "other_functions.h"
-#include "rele.h"
 #include "sensor.h"
+#include "rele.h"
 #include"timeranddate.h"
 #include "classGetDateInternet.h"
+#include "other_functions.h"
+
 #include "web.h"
 #include "setup.h"
 #include "loop.h"
