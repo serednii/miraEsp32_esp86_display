@@ -2,24 +2,18 @@
 
 
 
+//  
+//  prin("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+//  prin("numberRele", numberRele);
+//  prin("numberDataTime", numberDataTime);
+//  prin("dataAndTime[numberRele].data_datamiliseconds[numberDataTime]", dataAndTime[numberRele].data_datamiliseconds[numberDataTime]);
+//       prin("getDate.epochTime", getDate.epochTime);
+//       prin("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 
 boolean controlRangeDate(byte numberRele, byte numberDataTime) {
-  if (dataAndTime[numberRele].data_datamiliseconds[numberDataTime] <= (getDate.epochTime)  &&    dataAndTime[numberRele].data_datamiliseconds[numberDataTime + 1] >= (getDate.epochTime) )
-  {
-    //    Serial.print("RELE DATA VKL:");
-    //    Serial.println(numberRele);
-    return true;
-  } else {
-    //    Serial.print("RELE DATA OTKL:");
-    //    Serial.println(numberRele);
-    return false;
-  }
+       dataAndTime[numberRele].data_datamiliseconds[numberDataTime] <= (getDate.epochTime) && dataAndTime[numberRele].data_datamiliseconds[numberDataTime + 1] >= (getDate.epochTime)? true : false;
 }
 //******************************************************************************
-
-
-
-
 
 
 

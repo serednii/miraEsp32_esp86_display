@@ -1,6 +1,5 @@
 //--------------------------------------callback--------------------------------
-//-----------------------------------------------------------------------------
-// boolean blockGetMessega = false;
+//------------------------------------------------------------------------------
 void callback(const MQTT::Publish &pub) //було
 {
   prin("*************************************************************************************************************************************************");
@@ -39,13 +38,11 @@ void callback(const MQTT::Publish &pub) //було
   //*************************************************************************************************************************************************
   if (String(pub.topic()) == nameUser + "_define_device") ////Приводимо в початковий стан всі змінні
   {
-    //    if(payload == "setDefineDevice"){
     Serial.print("GET mesage setDefineDevice  ----  ");
     //    Serial.println(payload);
     sendPostRequest();
     sendGetRequest();
     OtherFunction::defineDevice();//Приводимо в початковий стан всі змінні
-    //    }
   }
   //*************************************************************************************************************************************************
 
@@ -60,7 +57,7 @@ void callback(const MQTT::Publish &pub) //було
   //*************************************************************************************************************************************************
 
   //*************************************************************************************************************************************************
-  if (String(pub.topic()) == nameUser + "_set-rele-data-time") //прийом дати і часу
+  if (String(pub.topic()) == nameUser + "_brouser_to_esp_set-rele-data-time") //прийом дати і часу
   {
     //{"RELE":3,
     //"delaySecondStart":"0",
@@ -70,15 +67,7 @@ void callback(const MQTT::Publish &pub) //було
     //{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},
     //{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"},{"N":"N"}],
     //"today":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]}
-
     TimerDate::writeEepromObjectDataTimeSendBrouser(dataAndTime, payload);
-
-    //    TimerDate::dataTimeJsonToObject(payload,  dataAndTime);
-    //    EEPROM.put(START_SECTION_EEPROM_TIMERDATE + (sizeof(TimerDate) * TimerDate::numberRele), dataAndTime[TimerDate::numberRele]); // write objeck to EEPROM
-    //    Eeprom::comitEprom();
-    //    TimerDate::readTimerEEPROMToObjeckt(dataAndTime);
-    //    client.publish(nameUser + "_esp_to_brouser_rele_data_time", TimerDate::objectToJsonDate(dataAndTime[TimerDate::numberRele], TimerDate::numberRele));
-
     kontr_temp();
     return;
   }
@@ -108,13 +97,10 @@ void callback(const MQTT::Publish &pub) //було
     if (payload == "readAddressSensor" || payload == "ALL") //OK
     {
       Sensor::sendSensorData(ds18b20EEprom, ds18b20);
-      //client.publish(nameUser + "_eepromSensorData", objectToJSON(ds18b20EEprom, NUMBER_RELE));
       //{"obj":[{"number": 0, "address": "0000000000000000", "temp": 0.00}]}
-      //client.publish(nameUser + "_deviceSensorData", objectToJSON(ds18b20, Sensor::deviceCountSensor));
       //{"obj":[{"number": 0, "address": "28ff6402e248ff11", "temp": 24.50}]}
       //      prin("readAddressSensor WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
     }
-
 
     //****************************************************************************************************
     //    if (payload == "NameSensor" || payload == "ALL")  //На видалення дані передаються через readAddressSensor  Sensor::sendSensorData(ds18b20EEprom, ds18b20);
@@ -181,22 +167,18 @@ void callback(const MQTT::Publish &pub) //було
   //*************************************************************************************************************************************************
   if (String(pub.topic()) == nameUser + "_save-rele-name") // проверяем из нужного ли нам топика пришли данные
   {
-    //    const byte kilkistyBukv = 20;
-    // 0vname1k START_SECTION_EEPROM_RELE_NAME //Зберігаємо імя реле
     //   //       {//переробити
     //      "number":1,
     //      "name":"name rele"
     //        }
-    //    Serial.println(payload);
-
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, payload);
-    byte numberRele = doc["number"];//номер реле
+    byte _currentRelay = doc["number"];//номер реле
     String nameRele = doc["name"];//Name rele
-    //    byte numberRele = payload.substring(0, payload.indexOf("*#*")).toInt();                  //номер реле
+    //    byte _currentRelay = payload.substring(0, payload.indexOf("*#*")).toInt();                  //номер реле
     //    String nameRele = payload.substring(payload.indexOf("*#*") + 3, payload.indexOf("*&*")); //імя реле
 
-    int address = numberRele * MAX_LENNGTH_TEXT_NAME_RELE_AND_SENSOR + START_SECTION_EEPROM_RELE_NAME;
+    int address = _currentRelay * MAX_LENNGTH_TEXT_NAME_RELE_AND_SENSOR + START_SECTION_EEPROM_RELE_NAME;
 
     Eeprom::writeStringEeprom(address, MAX_LENNGTH_TEXT_NAME_RELE_AND_SENSOR, nameRele, 0);
     Rele::readEepromNameRele(releControl);
@@ -248,27 +230,16 @@ void callback(const MQTT::Publish &pub) //було
 
     DynamicJsonDocument doc(1024);   //OK
     deserializeJson(doc, payload);
-    byte numberRele = doc["number"];//номер реле
+    byte _currentRelay = doc["number"];//номер реле
     byte tempVkl = doc["tempVkl"]; //Температура включеня
     byte tempOtkl = doc["tempOtkl"]; //Температура відключеня
 
+    int a = _currentRelay * 2 + START_SECTION_EEPROM_TEMP_ON_OFF;
 
-
-    // 0v255o255k START_SECTION_EEPROM_TEMP_ON_OFF //температура вкл і відкл  для реле по термодатчику
-    //    String s = payload.substring(0, payload.indexOf('v'));                         //номер термодатчика
-    //    String s1 = payload.substring(payload.indexOf('v') + 1, payload.indexOf('o')); //перша температура
-    //    String s2 = payload.substring(payload.indexOf('o') + 1, payload.indexOf('k')); //друга температура
-    int a = numberRele * 2 + START_SECTION_EEPROM_TEMP_ON_OFF;
-    //    EEPROM.write(a, s1.toInt() + 50);
-    //    EEPROM.write(a + 1, s2.toInt() + 50);
-
-    EEPROM.write(a, tempVkl + 50);
+    EEPROM.write(a, tempVkl + 50);//50 зміщеннф температури в  байті на 50 одиниць в гору приходило було (-50 до +125) а зберігаємо в байті від (0 - 175) 
     EEPROM.write(a + 1, tempOtkl + 50);
-
-
-
     Eeprom::comitEprom();
-    //    refreshData();
+    refreshData();
     kontr_temp();
     client.publish(nameUser + "_sensor-vkl-otkl", Rele::releOnOffEEPROMDataToJSON()); // send temp on temp off
     Serial.print("Send mesage ReadTempVklOtkl");
@@ -282,21 +253,17 @@ void callback(const MQTT::Publish &pub) //було
   if (String(pub.topic()) == nameUser + "_brouser_to_esp_rele_get_eprom_upr_manual") // проверяем из нужного ли нам топика пришли данные
   {
     //{"number":0,"data":"2"}
-
     DynamicJsonDocument doc(1024);   //OK
     deserializeJson(doc, payload);
-    byte numberRele = doc["number"];//номер реле
+    byte _currentRelay = doc["number"];//номер реле
     byte manualOrAuto = doc["data"]; //Ручний або автоматичний режим 1 або 0
-
-    prin("numberRele", numberRele);
-    //    manualOrAuto &= ~0b11111110; // reset bit 7-1
+    prin("_currentRelay", _currentRelay);
     prin("manualOrAuto ////////////////////*********************", manualOrAuto);
-    releControl[numberRele].setManualAutoEEPROM(manualOrAuto, numberRele); //Запмсуємо в память новий стан ручний або автоматичений режим
-
+    releControl[_currentRelay].setManualAutoEEPROM(manualOrAuto, _currentRelay); //Запмсуємо в память новий стан ручний або автоматичений режим
     if (manualOrAuto == 1)
     {
       //Якщо переходимо в ручний режим то стан реле неміняємо
-      Rele::manual_vklOtkl(releControl, releControl[numberRele].getOnOffManualEEPROM(numberRele), numberRele);
+      Rele::manual_vklOtkl(releControl, releControl[_currentRelay].getOnOffManualEEPROM(_currentRelay), _currentRelay);
     }
     //    refreshData();
     kontr_temp();
@@ -310,16 +277,16 @@ void callback(const MQTT::Publish &pub) //було
   {
     // 0x2k START_SECTION_RELE_EEPROM_FLAGS //Включаєм і виключаєм реле в ручному режимі
     //{"number":0,"data":"2"}
-    //    byte numRele = payload.substring(0, payload.indexOf('x')).toInt();                      //номер реле
-    //    byte onOff = payload.substring(payload.indexOf('x') + 1, payload.indexOf('k')).toInt(); //Включаєм або вииключаємо реле
+    //номер реле
+    //Включаєм або вииключаємо реле
 
     DynamicJsonDocument doc(1024);  //OK
     deserializeJson(doc, payload);
-    byte numberRele = doc["number"];//номер реле
+    byte _currentRelay = doc["number"];//номер реле
     byte onOff = doc["data"]; //Включаєм або вииключаємо реле
-    prin("numberRele", numberRele);
+    prin("_currentRelay", _currentRelay);
     prin("onOff", onOff);
-    Rele::manual_vklOtkl(releControl, onOff, numberRele);
+    Rele::manual_vklOtkl(releControl, onOff, _currentRelay);
     Rele::sendStanReleOnOff(releControl);
     doc.clear();
     return;
@@ -333,9 +300,9 @@ void callback(const MQTT::Publish &pub) //було
     //  {"number":0,"data":"2"}
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, payload);
-    byte numberRele = doc["number"];
+    byte _currentRelay = doc["number"];
     byte numSensorControlRele = doc["data"];
-    releControl[numberRele].setNumberSensorControlEEPROM(numSensorControlRele, numberRele);
+    releControl[_currentRelay].setNumberSensorControlEEPROM(numSensorControlRele, _currentRelay);
     //refreshData();
     kontr_temp();
     Rele::sendEEPROMDataToJSONSensor();
@@ -349,22 +316,14 @@ void callback(const MQTT::Publish &pub) //було
   {
     DynamicJsonDocument doc(1024);    //OK
     deserializeJson(doc, payload);
-    byte numberRele = doc["number"];
+    byte _currentRelay = doc["number"];
     byte errorOnOrOff = doc["data"];
-    prin("errorOnOrOff numberRele", numberRele);
+    prin("errorOnOrOff _currentRelay", _currentRelay);
     prin("errorOnOrOff OnOrOff", errorOnOrOff);
-    // 0x2k START_SECTION_RELE_EEPROM_SENSOR біт 6 при несправності термодатчика або не можливості керувати таймером  в якому стані залишаємо реле
-    //    {
-    //      "0":1//біт 6 при несправності термодатчика або не можливості керувати таймером  в якому стані залишаємо реле
-    //    }
-    //    prin("_rele_eprom_upr-set_erorr_rele_vkl_vukl----------------=================", pub.topic());
-    //    byte numberRele = payload.substring(0, payload.indexOf('x')).toInt();                          //номер реле
-    //    byte errorOnOrOff = payload.substring(payload.indexOf('x') + 1, payload.indexOf('k')).toInt(); //
     errorOnOrOff = (errorOnOrOff & ~0b10111111) >> 6;                                              //Залишаємо  тільки 6 біт і переміщаємо на нулоьовий біт
-    releControl[numberRele].setReleErrorEEPROM(errorOnOrOff, numberRele);
+    releControl[_currentRelay].setReleErrorEEPROM(errorOnOrOff, _currentRelay);
     kontr_temp();
     Rele::sendEEPROMDataToJSONSensor();
-    //    client.publish(nameUser + "_esp_to_brouser_rele_eprom_upr", Rele::sendEEPROMDataToJSONSensor());
     //    Serial.print("Rele::sendEEPROMDataToJSONSensor() ");
     //    Serial.print(Rele::sendEEPROMDataToJSONSensor());
     doc.clear();
@@ -377,19 +336,13 @@ void callback(const MQTT::Publish &pub) //було
   {
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, payload);    //OK
-    byte numberRele = doc["number"];
+    byte _currentRelay = doc["number"];
     byte OnOrOff = doc["data"];
 
-    prin("set_change_on_or_off numberRele", numberRele);
+    prin("set_change_on_or_off _currentRelay", _currentRelay);
     prin("set_change_on_or_off OnOrOff", OnOrOff);
-    // 0x2k START_SECTION_RELE_EEPROM_SENSOR біт 5 при переключенні реле включається або виключається
-    //    {
-    //      "0":1//біт 5 при переключенні реле включається або виключається
-    //    }
-    //    byte numberRele = payload.substring(0, payload.indexOf('x')).toInt();                     //номер реле
-    //    byte OnOrOff = payload.substring(payload.indexOf('x') + 1, payload.indexOf('k')).toInt(); //
     OnOrOff = (OnOrOff & ~0b11011111) >> 5;//Залишаємо  тільки 5 біт і переміщаємо на нулоьовий біт
-    releControl[numberRele].setOnOffChangeEEPROM(OnOrOff, numberRele);
+    releControl[_currentRelay].setOnOffChangeEEPROM(OnOrOff, _currentRelay);
 
     kontr_temp();
     Rele::sendEEPROMDataToJSONSensor();
@@ -402,139 +355,21 @@ void callback(const MQTT::Publish &pub) //було
   //*************************************************************************************************************************************************
   if (String(pub.topic()) == nameUser + "_brouser_to_esp_rele_set_one_or_two_range_temp") // проверяем из нужного ли нам топика пришли данные   _brouser_toesp_rele_set_one_or_two_range_temp     _rele_eprom_upr-set_one_or_two_range_temp
   {
-
-    // 0x2k START_SECTION_RELE_EEPROM_SENSOR біт 4 1-два діапазона температур включенн і відключеня 0-один діапазон температур  включення або відключення
-    //    {
-    //      "0":1//біт 4 1-два діапазона температур включенн і відключеня 0-один діапазон температур  включення або відключення
-    //    }
-
-    //{number: 0,  data: 243}         //OK
-
-
-
-    //    byte numberRele = payload.substring(0, payload.indexOf('x')).toInt();                           //номер реле
-    //    byte oneOrTworange = payload.substring(payload.indexOf('x') + 1, payload.indexOf('k')).toInt(); //
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, payload);
-    byte numberRele = doc["number"];
+    byte _currentRelay = doc["number"];
     byte oneOrTworange = doc["data"];
-    prin("sset_one_or_two_range numberRele", numberRele);
+    prin("sset_one_or_two_range _currentRelay", _currentRelay);
     prin("set_one_or_two_range OnOrOff", oneOrTworange);
     oneOrTworange = (oneOrTworange & ~0b11101111) >> 4; //Залишаємо  тільки 4 біт і переміщаємо на нулоьовий біт
-
-    releControl[numberRele].setOneOrTwoRangeEEPROM(oneOrTworange, numberRele);
-
+    releControl[_currentRelay].setOneOrTwoRangeEEPROM(oneOrTworange, _currentRelay);
     kontr_temp();
     Rele::sendEEPROMDataToJSONSensor();
-    //  client.publish(nameUser + "_esp_to_brouser_rele_eprom_upr", Rele::sendEEPROMDataToJSONSensor());   //_rele_eprom_upr
     doc.clear();
     return;
   }
   //*************************************************************************************************************************************************
 
 
-}
-//*************************************************************************************************************************************************
-
-
-
-
-
-
-
-
-
-
-
-
-//*************************************************************************************************************************************************
-int parseStringToData(String stringData)
-{ //пошук наступного елемента в строці якщо кінець повертає -1
-
-  symbolStart = stringData.indexOf('RELE') + 3;
-  symbolEnd = stringData.indexOf('-');
-  int numRele = stringData.substring(symbolStart, symbolEnd).toInt(); //номер реле
-
-  symbolStart = symbolEnd;
-  symbolEnd = stringData.indexOf('-', symbolStart + 1);
-
-  dataAndTime[numRele].delaySecondStart = stringData.substring(symbolStart + 1, symbolEnd).toInt(); //Затримка в секундах для включення реле
-
-  for (int i = 0; i < 10; i++)
-  {
-    unsigned long temp = nextElement(stringData);
-    if (temp >= 0)
-      dataAndTime[numRele].data_datamiliseconds[i] = temp;
-
-    temp = nextElement(stringData);
-    if (temp >= 0)
-      dataAndTime[numRele].data_rik[i] = temp;
-
-    temp = nextElement(stringData);
-    if (temp >= 0)
-      dataAndTime[numRele].data_months[i] = temp;
-
-    temp = nextElement(stringData);
-    if (temp >= 0)
-      dataAndTime[numRele].data_dey[i] = temp;
-
-    temp = nextElement(stringData);
-    if (temp >= 0)
-      dataAndTime[numRele].data_godyna[i] = temp;
-
-    temp = nextElement(stringData);
-    if (temp >= 0)
-      dataAndTime[numRele].data_minut[i] = temp;
-
-    temp = nextElement(stringData);
-    if (temp >= 0)
-      dataAndTime[numRele].data_daywikend[i] = temp;
-  }
-
-  for (int i = 0; i < 50; i++)
-  {
-    int temp = nextElement(stringData);
-    if (temp >= 0)
-      dataAndTime[numRele].godyna[i] = temp;
-    temp = nextElement(stringData);
-    if (temp >= 0)
-      dataAndTime[numRele].minut[i] = temp;
-  }
-
-  for (int i = 0; i < 35; i++)
-  {
-    int temp = nextElement(stringData);
-    if (temp >= 0)
-      dataAndTime[numRele].dey[i] = temp;
-  }
-  return numRele;
-}
-//*************************************************************************************************************************************************
-
-//*************************************************************************************************************************************************
-unsigned long nextElement(String s)
-{ //пошук наступного елемента в строці якщо кінець повертає -1
-  symbolStart = symbolEnd;
-  symbolEnd = s.indexOf('-', symbolStart + 1);
-  if (!(symbolStart < 0 || symbolEnd < 0))
-  {
-    String s2 = s.substring(symbolStart + 1, symbolEnd); //номер реле
-    //     Serial.print("SSSS22222 ");
-    //    Serial.println(s2);
-    unsigned long a = 0;
-    for (byte i = 0; i < s2.length(); i++)
-    {
-      a = a * 10;
-      String s3 = s2.substring(i, i + 1);
-      //   Serial.print("SSSS333 ");
-      //    Serial.println(s3);
-      int b = s3.toInt();
-      a = a + b;
-    }
-    //    Serial.println(a);
-    return a;
-  }
-  else
-    return -1;
 }
 //*************************************************************************************************************************************************

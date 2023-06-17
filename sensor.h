@@ -8,13 +8,13 @@ class Sensor           // название класса
     float temp;
     int tempVkl;
     int tempOtkl;
+    byte tempNumberSensor; //Для збору всіх сенсорів в один список для виведення на екран
     static int deviceCountSensor; //КІЛЬКІСТЬ ПІДКЛЮЧЕНИХ ДАТЧИКІВ
 
     //****************************************************************************************************
     static String objectToJSON(Sensor obj[], int n)
     {
       DynamicJsonDocument doc(2000);
-
       String json;
       for (int i = 0; i < n; i++)
       {
@@ -22,10 +22,7 @@ class Sensor           // название класса
         doc["obj"][i]["address"] = obj[i].strAddress;
         doc["obj"][i]["temp"] = obj[i].temp;
       }
-
       serializeJson(doc, json);
-      //    prin("OUTPUT LENGTH", json.length());
-      //    prin("OUTPUT LENGTH", json);
       doc.clear();
       return json;
     }
@@ -49,10 +46,6 @@ class Sensor           // название класса
         ds18b20[i].strAddress = sensorDeviceAddress(Thermometer);
         ds18b20[i].temp = sensors.getTempCByIndex(i);
         ds18b20[i].number = i;
-        //            Serial.print("strAddress YYYYYYYYYYYYYYYYYYYYYYYY  ");
-        //            Serial.print(ds18b20[i].strAddress);
-        //            Serial.print(" temp  ");
-        //            Serial.println(ds18b20[i].temp);
       }
     }
     //****************************************************************************************************
@@ -162,20 +155,9 @@ class Sensor           // название класса
         ds18b20EEprom[i].nameSensor = Eeprom::readStringEeprom(START_SECTION_EEPROM_SENSOR_NAME + (i * MAX_LENNGTH_TEXT_NAME_RELE_AND_SENSOR), MAX_LENNGTH_TEXT_NAME_RELE_AND_SENSOR);
         ds18b20EEprom[i].strAddress = strAddress;
         ds18b20EEprom[i].temp = 0;
-
-        //    Serial.print("nameSensor ");
-        //    Serial.print(ds18b20EEprom[i].nameSensor);
-        //     Serial.print("strAddress ");
-        //    Serial.print(ds18b20EEprom[i].strAddress);
-        //    Serial.print(" temp  ");
-        //    Serial.println(ds18b20EEprom[i].temp);
       }
     }
     //****************************************************************************************************
-
-
-
-    //*************************************************************************************************************************************************
 
     //*************************************************************************************************************************************************
     static void sendSensorData(Sensor ds18b20EEprom[], Sensor ds18b20[])
@@ -198,13 +180,8 @@ class Sensor           // название класса
 
       String json;
       serializeJson(doc, json);
-      //      Serial.println("AAAAAAAAAAAAAAAAAAAAAAAAA  json  9999999  json  99999999999 ");
-      //      Serial.println(json);
       //формуємо в формат JSON дані з памяті EEPROM і відправляємо в топік
-      client.publish(nameUser + "_esp_to_brouser_eeprom_sensor_data", json);//_esp_to_brouser_eeprom_sensor_data  _eepromSensorData
-      //    client.publish(nameUser + "_eepromSensorData", Sensor::objectToJSON(ds18b20EEprom, 8));
-      //      Serial.println(Sensor::objectToJSON(ds18b20EEprom, MAX_NUMBER_SENSOR));
-
+      if (EEPROM.read(EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT) > 0)client.publish(nameUser + "_esp_to_brouser_eeprom_sensor_data", json); // client
       //{"obj":[{"number": 0, "address": "0000000000000000", "temp": 0.00},{"number": 1, "address": "0000000000000000", "temp": 0.00},
       //{"number": 2, "address": "28ff640219a1faa5", "temp": 24.50},{"number": 3, "address": "28ff640219d911ac", "temp": 24.44},
       //{"number": 4, "address": "28ff6402e3dd8161", "temp": 24.75},{"number": 5, "address": "0000000000000000", "temp": 0.00},
@@ -220,22 +197,8 @@ class Sensor           // название класса
       }
 
       serializeJson(doc, json);
-      //      Serial.println("BBBBBBBBBBBBBBBBBBBBBBB  json  9999999  json  99999999999 ");
-      //      Serial.println(json);
-
-      client.publish(nameUser + "_esp_to_brouser_device_sensor_data", json); //  _esp_to_brouser_device_sensor_data    _deviceSensorData
-
-      //  client.publish(nameUser + "_deviceSensorData", Sensor::objectToJSON(ds18b20, deviceCountSensor));
-
-      prin("Sensor::objectToJSON", Sensor::objectToJSON(ds18b20, MAX_NUMBER_SENSOR));
-
-      //{"obj":[{"number": 0, "address": "28ff6402e248ff11", "temp": 24.50},{"number": 1, "address": "28ff6402e24588e3", "temp": 24.87},
-      //{"number": 2, "address": "28ff640219a1faa5", "temp": 24.50},{"number": 3, "address": "28ff640219d911ac", "temp": 24.44},
-      //{"number": 4, "address": "28ff6402e3dd8161", "temp": 24.75},{"number": 5, "address": "28ff6402ef3a6cd5", "temp": 24.44},
-      //{"number": 6, "address": "28ff6402efc3d131", "temp": 24.25},{"number": 7, "address": "28ff6402ef7b2b4f", "temp": 24.44}]}
-
+      if (EEPROM.read(EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT) > 0)client.publish(nameUser + "_esp_to_brouser_device_sensor_data", json); // client
       json = "";
-      //doc["obj"]="";
 
       for (int i = 0; i < MAX_NUMBER_SENSOR; i++) {
         doc["obj"][i]["number"] = 0;
@@ -243,17 +206,8 @@ class Sensor           // название класса
         doc["obj"][i]["temp"] = 0;
         doc["obj"][i]["nameSensor"] = ds18b20EEprom[i].nameSensor;
       }
-      //      Serial.println("CCCCCCCCCCCCCCCCCCC json  333333333  json  33333333333333333333333333333333 ");
-      //      serializeJson(doc, json);
-      //      Serial.println(json);
-      //  Serial.println(ds18b20EEpromToJSONnameSensor());
-      //  client.publish(nameUser + "_sensor-name", json);// ds18b20EEpromToJSONnameSensor()
-      //    client.publish(nameUser + "_sensor-name", ds18b20EEpromToJSONnameSensor());// ds18b20EEpromToJSONnameSensor()
-      // {"obj":[{"nameSensor": "cherpadl"},{"nameSensor": "kuxyn"},{"nameSensor": "sddff"},{"nameSensor": "name4"},{"nameSensor": "name5"},{"nameSensor": "name6"},{"nameSensor": ""},{"nameSensor": ""}]}
     }
     //*************************************************************************************************************************************************
-
-
 };
 int Sensor::deviceCountSensor;
 Sensor ds18b20[MAX_NUMBER_SENSOR];

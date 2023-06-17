@@ -68,26 +68,7 @@ const String pageForm_1 = "</div></div><div class=\"container\"><div class=\"con
 <p>List of registered routers</p>\
 <p>Seznam registrovaných routerů</p>\
 <form class=\"form-ssid\" method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"router\">";
-//
-//const String items1_1 = "<div class=\"ssid-items\">\
-//<div class=\"ssid-items__input\">\
-//<input class=\"input input-ssid\" type=\"text\" name=\"SSID-";
-//const String items1_2 = "\" maxlength=\"";
-//const String items1_3 = "\" value=\"";
-//const String items1_4 = "\"  placeholder=\"Enter your SSID\">\
-//<input class=\"input input-pass\" type=\"text\" name=\"Passowrd-";
-//const String items1_5 = "\" maxlength=\"";
-//const String items1_6 = "\" value=\"";
-//const String items1_7 = "\" placeholder=\"Enter your PASSWORD\">\
-//<p class=\"password-control\"></p>\
-//</div>\
-//<div class=\"ssid-items__btn\">\
-//<div class=\"add-ssid\">Add a router</div>\
-//<div class=\"clear-ssid\"> Clear data</div>\
-//</div>\
-//</div>";
-//
-//
+
 
 
 const String end_form = "<input class=\"btn1\" type=\"submit\" value=\"Save\">\
@@ -399,11 +380,7 @@ void scanWifi()
   int32_t channel;
   bool hidden;
   int scanResult;
-
-  Serial.println(F("Starting WiFi scan..."));
-
   scanResult = WiFi.scanNetworks(/*async=*/false, /*hidden=*/true);
-
   if (scanResult == 0)
   {
     Serial.println(F("No networks found"));
@@ -411,8 +388,6 @@ void scanWifi()
   else if (scanResult > 0)
   {
     Serial.printf(PSTR("%d networks found:\n"), scanResult);
-    // <p class=\"scan-wifi_list\">rbsrt</p>\
-
     // Print unsorted scan results
     form1_2 = "";
     for (int8_t i = 0; i < scanResult; i++)
@@ -471,16 +446,6 @@ void scanWifi()
 
       form1_2 += WiFi.SSID(i);
       form1_2 += "</p>";
-      //      Serial.printf(PSTR("  %02d: [CH %02d] [%02X:%02X:%02X:%02X:%02X:%02X] %ddBm %c %c %s\n"),
-      //                    i,
-      //                    channel,
-      //                    bssid[0], bssid[1], bssid[2],
-      //                    bssid[3], bssid[4], bssid[5],
-      //                    rssi,
-      //                    (encryptionType == ENC_TYPE_NONE) ? ' ' : '*',
-      //                    hidden ? 'H' : 'V',
-      //                    ssid.c_str());
-      //      delay(0);
     }
   }
   else

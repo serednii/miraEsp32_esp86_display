@@ -24,7 +24,6 @@ class Rele // название класса
     //START_SECTION_RELE_EEPROM_SENSOR
     byte numberSensorControl; // bit 0-7 номер датчика який управляє даним реле
 
-
     boolean errorSensor; //Якщо пропав датчик флаг ставимо в true
     boolean flagsTermo;//  якщо спрацювала умова включення для термодатчика
     boolean flagsTimer;//  якщо спрацювала умова включення для таймера
@@ -36,10 +35,10 @@ class Rele // название класса
     void setManualAutoEEPROM(byte stan, byte numberRele) {
       manualAuto = stan;//РУЧНИЙ АБО АВТОМАТ
       int address = numberRele + START_SECTION_RELE_EEPROM_FLAGS;
-      prin("address", address);
-      prin("numberRele", numberRele);
-      prin("stan", stan);
-      prin("manualAuto+++++++++++++++++++++++++++", manualAuto);
+//      prin("address", address);
+//      prin("numberRele", numberRele);
+//      prin("stan", stan);
+//      prin("manualAuto+++++++++++++++++++++++++++", manualAuto);
       setOrResetBitEEPROM(address, 0, stan);
       kontr_temp();
     }
@@ -54,7 +53,7 @@ class Rele // название класса
       setOrResetBitEEPROM(address, 1, stan);
     }
 
-      void setOneOrTwoRangeEEPROM(byte stan, byte numberRele) {
+    void setOneOrTwoRangeEEPROM(byte stan, byte numberRele) {
       //      Serial.print("stan ---------------  ");
       //      Serial.println(stan);
       //      Serial.print("numberRele ---------------  ");
@@ -95,9 +94,6 @@ class Rele // название класса
       EEPROM.write(address, numberSensorControl);
       Eeprom::comitEprom();
     }
-
-  
-
     //*****************************************************************
 
     //*****************************************************************
@@ -127,48 +123,21 @@ class Rele // название класса
       return getBitEEPROM(address, 6);
     }
 
-    //       byte getTermoControlEEPROM(byte numberRele) {//Не використовується взагалі
-    //      int address = numberRele + START_SECTION_RELE_EEPROM_FLAGS;
-    //      return getBitEEPROM(address, 2);
-    //    }
-
-    //        byte getTimerControlEEPROM(byte numberRele) {//Не використовується для EEPROM
-    //      int address = numberRele + START_SECTION_RELE_EEPROM_FLAGS;
-    //      return getBitEEPROM(address, 3);
-    //    }
-
-
     byte getNumberSensorControlEEPROM(byte numberRele) {
       int address = numberRele + START_RELE_EEPROM_SENSOR_UPR;
       byte temp = EEPROM.read(address);
-      //      prin("numberRele", temp);
-      //      prin("numberRele", temp & ~0b11110000);
-
-      //      return temp & ~0b11110000;
       return temp;
     }
-
-
-
     //*************************************************************************************************************************************************
 
 
     //*************************************************************************************************************************************************
     void setOrResetBitEEPROM(int address, byte numBit, byte setOrReset) {
       byte data = EEPROM.read(address);
-
-      //      prin("sizeof(LENGTH_SECTION_SSID_ADN_PASSWORD)  ", data);
-
-      if (setOrReset == 0) {
-        data &= ~(1 << numBit);//reset bit
-      } else if (setOrReset == 1) {
-        data |= (1 << numBit);//set bit
-      }
+      setOrReset == 0 ? data &= ~(1 << numBit) : data |= (1 << numBit);   //set or reset bit
       EEPROM.write(address, data);
       Eeprom::comitEprom();
-
       data = EEPROM.read(address);
-      //      prin("sizeof(LENGTH_SECTION_SSID_ADN_PASSWORD)  ", data);
     }
 
 
@@ -191,22 +160,24 @@ class Rele // название класса
         digitalRead(obj[i].numberPin) == 0 ? doc["data"][i] = 1 : doc["data"][i] = 0; //Формуємо маску бітів про стан кожного реле і відправляємо
       }
       serializeJson(doc, stanRele);
-      client.publish(nameUser + "_esp_to_brouser_stan_rele", stanRele);
+      if (EEPROM.read(EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT) > 0)client.publish(nameUser + "_esp_to_brouser_stan_rele", stanRele); // client
+
       doc.clear();
     }
     //*************************************************************************************************************************************************
-   //*************************************************************************************************************************************************
+    //*************************************************************************************************************************************************
     static void sendStanReleManualAuto(Rele releControl[])  //Відправляємо стани всіх реле
     {
-      
+
       DynamicJsonDocument doc(1024);  //OK
       String stanRele;
       for (int i = 0; i < NUMBER_RELE; i++) {
-         doc["data"][i] = releControl[i].getManualAutoEEPROM(i); //Формуємо object бітів про стан кожного реле і відправляємо
+        doc["data"][i] = releControl[i].getManualAutoEEPROM(i); //Формуємо object бітів про стан кожного реле і відправляємо
       }
       serializeJson(doc, stanRele);
       prin(stanRele);
-      client.publish(nameUser + "_rele-out-eprom_upr-manual", stanRele);
+      if (EEPROM.read(EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT) > 0)client.publish(nameUser + "_rele-out-eprom_upr-manual", stanRele); // client
+
       doc.clear();
     }
     //*************************************************************************************************************************************************
@@ -228,8 +199,8 @@ class Rele // название класса
       String json;
       serializeJson(doc, json);
       //  prin("objecToJson 204 ", json);
-
-      client.publish(nameUser + "_esp_to_brouser_rele_eprom_upr", json);   //_rele_eprom_upr
+      if (EEPROM.read(EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT) > 0) client.publish(nameUser + "_esp_to_brouser_rele_eprom_upr", json); // client
+      //_rele_eprom_upr
       doc.clear();
     }
     //*************************************************************************************************************************************************
@@ -270,7 +241,7 @@ class Rele // название класса
       DynamicJsonDocument doc(1024);
       for (int i = 0; i < NUMBER_RELE; i++)
       {
-        doc["obj"][i]["vkl"] = EEPROM.read(START_SECTION_EEPROM_TEMP_ON_OFF + i * 2) - 50;
+        doc["obj"][i]["vkl"] = EEPROM.read(START_SECTION_EEPROM_TEMP_ON_OFF + i * 2) - 50;//50 зміщеннф температури в  байті на 50 одиниць в низ зпамяті читаємо (0 - 175) а зберігаємо в обєкт від (-50 до +125) 
         doc["obj"][i]["otkl"] = EEPROM.read(START_SECTION_EEPROM_TEMP_ON_OFF + i * 2 + 1) - 50;
       }
       serializeJson(doc, json);
@@ -282,13 +253,13 @@ class Rele // название класса
     //*************************************************************************************************************************************************
 
     //*************************************************************************************************************************************************
-    static void manual_vklOtkl(Rele releControl[], int onOff, int numRele ) {
+    static void manual_vklOtkl(Rele releControl[], int onOff, int _currentRelay ) {
       if (onOff == 0) { //Виключаємо реле
-        releControl[numRele].setOnOffManualEEPROM(onOff, numRele);
-        digitalWrite(releControl[numRele].numberPin, HIGH);
+        releControl[_currentRelay].setOnOffManualEEPROM(onOff, _currentRelay);
+        digitalWrite(releControl[_currentRelay].numberPin, HIGH);
       } else if (onOff == 1) { //Включаємо реле
-        releControl[numRele].setOnOffManualEEPROM(onOff, numRele);
-        digitalWrite(releControl[numRele].numberPin, LOW);
+        releControl[_currentRelay].setOnOffManualEEPROM(onOff, _currentRelay);
+        digitalWrite(releControl[_currentRelay].numberPin, LOW);
       }
     }
     //*************************************************************************************************************************************************

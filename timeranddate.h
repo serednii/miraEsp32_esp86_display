@@ -1,4 +1,4 @@
-//void TimerDate::readTimerEEPROMToObjeckt(dataAndTime)();
+
 
 class TimerDate {
   public:
@@ -13,7 +13,7 @@ class TimerDate {
     byte godyna[50];
     byte minut[50];
     byte dey[35];
-    static byte numberRele;
+    static byte currentRelay;
 
 
     //    static void sendDateTime(TimerDate dataAndTime[]) {  //refreshobjectToJsonDate
@@ -112,56 +112,59 @@ class TimerDate {
       //{"rele":0,"default":"default"}//Очищаємо всі значення для таймерів
 
       dataTimeJsonToObject(json,  dataAndTime);//Записуємо в  обєкт dataAndTime по індексу який приходить в строці json для конкретного реле
-      EEPROM.put(START_SECTION_EEPROM_TIMERDATE + (sizeof(TimerDate) * TimerDate::numberRele), dataAndTime[TimerDate::numberRele]); // write objeck to EEPROM
+      EEPROM.put(START_SECTION_EEPROM_TIMERDATE + (sizeof(TimerDate) * TimerDate::currentRelay), dataAndTime[TimerDate::currentRelay]); // write objeck to EEPROM
       Eeprom::comitEprom();
       TimerDate::readTimerEEPROMToObjeckt(dataAndTime);
-      client.publish(nameUser + "_esp_to_brouser_rele_data_time", TimerDate::objectToJsonDate(dataAndTime[TimerDate::numberRele], TimerDate::numberRele));
-    
+       if (EEPROM.read(EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT) > 0)  
+       client.publish(nameUser + "_esp_to_brouser_rele_data_time", TimerDate::objectToJsonDate(dataAndTime[TimerDate::currentRelay], TimerDate::currentRelay)); // client
+     
     }
      
 
     //*************************************************************************************************************************************************
     static  void dataTimeJsonToObject(String json, TimerDate dataAndTime[]) {//Записуємо в  обєкт dataAndTime по індексу який приходить в строці json для конкретного реле
-      DynamicJsonDocument doc(2000);
+      DynamicJsonDocument doc(4000);
       deserializeJson(doc, json);
-      byte numberRele =  doc["rele"];
-      TimerDate::numberRele = numberRele;
+      byte _currentRelay =  doc["RELE"];
+      prin("json", json);
+      prin("currentRelay  128  ******************* ",_currentRelay);
+      TimerDate::currentRelay = _currentRelay;
       word delaySecondStart = doc["delaySecondStart"];
       for (byte i = 0; i < 10; i++) {
         if (doc["dataTime"][i]["N"] || doc["default"]) {
-          dataAndTime[numberRele].data_datamiliseconds[i] = 4294967295;
-          dataAndTime[numberRele].data_rik[i] = 65535;
-          dataAndTime[numberRele].data_months[i] = 99;
-          dataAndTime[numberRele].data_dey[i] = 99;
-          dataAndTime[numberRele].data_godyna[i] = 99;
-          dataAndTime[numberRele].data_minut[i] = 99;
-          dataAndTime[numberRele].data_daywikend[i] = 99;
+          dataAndTime[_currentRelay].data_datamiliseconds[i] = 4294967295;
+          dataAndTime[_currentRelay].data_rik[i] = 65535;
+          dataAndTime[_currentRelay].data_months[i] = 99;
+          dataAndTime[_currentRelay].data_dey[i] = 99;
+          dataAndTime[_currentRelay].data_godyna[i] = 99;
+          dataAndTime[_currentRelay].data_minut[i] = 99;
+          dataAndTime[_currentRelay].data_daywikend[i] = 99;
         } else {
-          dataAndTime[numberRele].data_datamiliseconds[i] = doc["dataTime"][i]["DM"];
-          dataAndTime[numberRele].data_rik[i] = doc["dataTime"][i]["Y"];
-          dataAndTime[numberRele].data_months[i] = doc["dataTime"][i]["M"];
-          dataAndTime[numberRele].data_dey[i] = doc["dataTime"][i]["D"];
-          dataAndTime[numberRele].data_godyna[i] = doc["dataTime"][i]["H"];
-          dataAndTime[numberRele].data_minut[i] = doc["dataTime"][i]["MI"];
-          dataAndTime[numberRele].data_daywikend[i] = doc["dataTime"][i]["T"];
+          dataAndTime[_currentRelay].data_datamiliseconds[i] = doc["dataTime"][i]["DM"];
+          dataAndTime[_currentRelay].data_rik[i] = doc["dataTime"][i]["Y"];
+          dataAndTime[_currentRelay].data_months[i] = doc["dataTime"][i]["M"];
+          dataAndTime[_currentRelay].data_dey[i] = doc["dataTime"][i]["D"];
+          dataAndTime[_currentRelay].data_godyna[i] = doc["dataTime"][i]["H"];
+          dataAndTime[_currentRelay].data_minut[i] = doc["dataTime"][i]["MI"];
+          dataAndTime[_currentRelay].data_daywikend[i] = doc["dataTime"][i]["T"];
         }
       }
 
       for (byte i = 0; i < 50; i++) {
         if (doc["Time"][i]["N"] || doc["default"]) {
-          dataAndTime[numberRele].godyna[i] = 99;
-          dataAndTime[numberRele].minut[i] = 99;
+          dataAndTime[_currentRelay].godyna[i] = 99;
+          dataAndTime[_currentRelay].minut[i] = 99;
         } else {
-          dataAndTime[numberRele].godyna[i] = doc["Time"][i]["H"];
-          dataAndTime[numberRele].minut[i] = doc["Time"][i]["MI"];
+          dataAndTime[_currentRelay].godyna[i] = doc["Time"][i]["H"];
+          dataAndTime[_currentRelay].minut[i] = doc["Time"][i]["MI"];
         }
       }
 
       for (byte i = 0; i < 35; i++) {
         if (!doc["default"]) {
-          dataAndTime[numberRele].dey[i] = doc["today"][i];
+          dataAndTime[_currentRelay].dey[i] = doc["today"][i];
         } else {
-          dataAndTime[numberRele].dey[i] = 1;
+          dataAndTime[_currentRelay].dey[i] = 1;
         }
       }
        doc.clear();
@@ -192,52 +195,7 @@ class TimerDate {
     }
     //*************************************************************************************************************************************************
 
-
-    //*************************************************************************************************************************************************
-    //static void clearEepromDate(byte relayNumber) {
-    //  byte x = 99;
-    //  dataAndTime[relayNumber].delaySecondStart = 65535;
-    //  for (int i = 0; i < 10; i++) {
-    //    dataAndTime[relayNumber].data_datamiliseconds[i] = 4294967295;
-    //    dataAndTime[relayNumber].data_rik[i] = 65535;
-    //    dataAndTime[relayNumber].data_months[i] = x;
-    //    dataAndTime[relayNumber].data_dey[i] = x;
-    //    dataAndTime[relayNumber].data_godyna[i] = x;
-    //    dataAndTime[relayNumber].data_minut[i] = x;
-    //    dataAndTime[relayNumber].data_daywikend[i] = x;
-    //  }
-    //
-    //  for (int i = 0; i < 50; i++) {
-    //    dataAndTime[relayNumber].godyna[i] = x;
-    //    dataAndTime[relayNumber].minut[i] = x;
-    //  }
-    //
-    //  for (int i = 0; i < 35; i++) {
-    //    dataAndTime[relayNumber].dey[i] = x;
-    //  }
-    //
-    //  EEPROM.put(START_SECTION_EEPROM_TIMERDATE + (sizeof(TimerDate)*relayNumber), dataAndTime[relayNumber]); //write objeck to EEPROM
-    //  Eeprom::comitEprom();
-    //}
-    //*************************************************************************************************************************************************
-
-
-
-
-
-
 };
 
-byte TimerDate::numberRele;
+byte TimerDate::currentRelay;
 TimerDate dataAndTime[NUMBER_RELE];
-
-
-
-
-//*************************************************************************************************************************************************
-
-
-//*************************************************************************************************************************************************
-
-
-//*************************************************************************************************************************************************

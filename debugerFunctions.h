@@ -49,10 +49,16 @@ void printObjectTime() {
 }
 
 void prin(String s, byte a) {
-  if(FLAGPRINT){prinString(s);
-  Serial.println(a);
+  if(FLAGPRINT){
+    
   prinString(s);
+  prinString(" -DEC- ");
+  Serial.println(a);
+  
+  prinString(s);
+  prinString(" -BIN- ");
   Serial.println(a, BIN);
+  
   }
 }
 
@@ -63,6 +69,14 @@ void prin(String s, int a) {
 }
 
 void prin(String s, word a) {
+  prinString(s);
+  Serial.println(a);
+}
+void prin(String s, long a) {
+  prinString(s);
+  Serial.println(a);
+}
+void prin(String s, unsigned long a) {
   prinString(s);
   Serial.println(a);
 }
@@ -119,11 +133,11 @@ void prinEEPROMDebag(int starting, int lengthSection, String nameSection) {
     
     byte dataByte = EEPROM.read(i);
     Serial.print(i);
-    Serial.print("--");
+    Serial.print("-DEC-");
     Serial.print(dataByte);
-    Serial.print("--");
+    Serial.print("-BIN-");
     Serial.print(dataByte, BIN);
-    Serial.print("--");
+    Serial.print("-CHAR-");
     Serial.print((char)dataByte);
     Serial.print("   ");
   }
