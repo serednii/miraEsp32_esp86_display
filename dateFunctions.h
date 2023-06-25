@@ -2,24 +2,22 @@
 
 
 
-//  
-//  prin("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-//  prin("numberRele", numberRele);
-//  prin("numberDataTime", numberDataTime);
-//  prin("dataAndTime[numberRele].data_datamiliseconds[numberDataTime]", dataAndTime[numberRele].data_datamiliseconds[numberDataTime]);
-//       prin("getDate.epochTime", getDate.epochTime);
-//       prin("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 
-boolean controlRangeDate(byte numberRele, byte numberDataTime) {
-       dataAndTime[numberRele].data_datamiliseconds[numberDataTime] <= (getDate.epochTime) && dataAndTime[numberRele].data_datamiliseconds[numberDataTime + 1] >= (getDate.epochTime)? true : false;
-}
+//prin("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+//prin("numberRele", numberRele);
+//prin("numberDataTime", numberDataTime);
+//prin("dataAndTime[numberRele].data_datamiliseconds[numberDataTime]", dataAndTime[numberRele].data_datamiliseconds[numberDataTime]);
+//prin("getDate.epochTime", getDate.epochTime);
+//prin("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+
+//boolean controlRangeDate(byte numberRele, byte numberDataTime) {
+//  if(dataAndTime[numberRele].data_datamiliseconds[numberDataTime] <= (getDate.epochTime) && dataAndTime[numberRele].data_datamiliseconds[numberDataTime + 1] >= (getDate.epochTime)){
+//    return true; 
+//  }  else {
+//    return false;
+//  }
+//}
 //******************************************************************************
-
-
-
-
-
-
 
 
 //void deleteAndMovingSection(byte numberRele) {
@@ -39,7 +37,6 @@ boolean controlRangeDate(byte numberRele, byte numberDataTime) {
 //      //      client.publish(nameUser+"_out-web-rele-data-time", objectToJsonDate(numberRele));
 //    }
 //  }
-//
 //}
 
 //void deleteOldDate(byte numberRele, byte numberDataTime) {

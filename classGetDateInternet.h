@@ -72,8 +72,17 @@ class GetDate {
       //    Serial.println();
       return getDate;
     }
-//*****************************************************************************
+//******************************************************************************
 
+//******************************************************************************
+static boolean controlRangeDate(GetDate getDate, byte numberRele, byte numberDataTime) {
+  if(dataAndTime[numberRele].data_datamiliseconds[numberDataTime] <= (getDate.epochTime) && dataAndTime[numberRele].data_datamiliseconds[numberDataTime + 1] >= (getDate.epochTime)){
+    return true; 
+  }  else {
+    return false;
+  }
+}
+//******************************************************************************
 
 //******************************************************************************
 static byte controlRangeHour(GetDate getDate, byte _currentRelay, byte numberDataTime) {

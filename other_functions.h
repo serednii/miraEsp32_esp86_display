@@ -15,7 +15,7 @@ class OtherFunction {
     static void defineDevice() { //Приводимо в початковий стан всі змінні
       for (int i = START_SECTION_EEPROM_SSID_AND_PASSWORD; i < START_SECTION_EEPROM_SSID_AND_PASSWORD + LENGTH_SECTION_SSID_ADN_PASSWORD; i++) EEPROM.write(i, 0);
       for (int i = START_RELE_EEPROM_SENSOR_UPR; i < START_RELE_EEPROM_SENSOR_UPR + LENGTH_RELE_EEPROM_SENSOR_UPR; i++) EEPROM.write(i, 255);
-      for (int i = START_SECTION_RELE_EEPROM_FLAGS; i < START_SECTION_RELE_EEPROM_FLAGS + LENGTH_RELE_EEPROM_FLAGS; i++) EEPROM.write(i, 255);
+      for (int i = START_SECTION_RELE_EEPROM_FLAGS; i < START_SECTION_RELE_EEPROM_FLAGS + LENGTH_RELE_EEPROM_FLAGS; i++) EEPROM.write(i, 0b10101101);
       for (int i = START_SECTION_EEPROM_TEMP_ON_OFF; i < START_SECTION_EEPROM_TEMP_ON_OFF + LENGTH_TEMP_ON_OFF; i += 2) EEPROM.write(i, 75);
       for (int i = START_SECTION_EEPROM_TEMP_ON_OFF + 1; i < START_SECTION_EEPROM_TEMP_ON_OFF + LENGTH_TEMP_ON_OFF; i += 2) EEPROM.write(i, 80);
       for (int i = START_SECTION_EEPROM_SENSOR_ADDRESS; i < START_SECTION_EEPROM_SENSOR_ADDRESS + LENGTH_SECTION_EEPROM_SENSOR_ADDRESS + 20 * NUMBER_RELE; i++) EEPROM.write(i, 0);
@@ -31,9 +31,10 @@ class OtherFunction {
         TimerDate::writeEepromObjectDataTimeSendBrouser(dataAndTime, str);
       }
       //      printObjectTime();
-      kontr_temp();
+//      kontr_temp();
       Serial.print("void defineDevice()");
-      //resetFunc();deviceCountSensor
+      resetFunc();
+//      deviceCountSensor
     }
     //*************************************************************************************************************************************************
 

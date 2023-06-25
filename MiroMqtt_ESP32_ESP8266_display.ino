@@ -38,20 +38,16 @@ WiFiMulti wifiMulti;
 
 
 
-
+#include "declaration.h"
 #include "memory_allocation_EEPROM.h"
 #include "const.h"
 #include "const_pin.h"
 #include "var_global.h"
 
-#include "declaration.h"
+
 
 const String nameUser = "mykola";
 boolean connectedInternet = false;
-
-
-
-
 
 
 

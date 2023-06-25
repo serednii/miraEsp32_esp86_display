@@ -24,11 +24,5 @@ void setup()
   lcd.print("LCD Tutorial");
 
 setupFunction();
-
-  //  EEPROM.write(EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT, 0);
-  //      for (int i = 1; i < 4096; i++) {
-  //          EEPROM.write(i, 0);
-  //        }
-  //  Eeprom::comitEprom();
-
+outAllDataOnServer();
 }

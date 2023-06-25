@@ -1,6 +1,6 @@
 
 void scanWifi();
-
+void outAllDataOnServer();
 void refreshData();
 void setupFunction();
  void controlPins();
@@ -8,7 +8,7 @@ void setupFunction();
  int controlPin(byte numberRele, int counterPin, byte pinConected);
 void kontr_temp();
 void blink();
-boolean controlRangeDate(byte numberRele, byte numberDataTime);
+//boolean controlRangeDate(byte numberRele, byte numberDataTime);
 void printObjectTime();
 void prin(String s, byte a);
 void prin(String s, word a); 

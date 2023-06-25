@@ -82,6 +82,7 @@ void setupFunction()
     lcd.print(APPSK);
     //*************************lcd***************************
     delay(1000);
+    lcd.clear();
   }
 
   else if (EEPROM.read(EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT) > 0) { // client
@@ -167,6 +168,7 @@ void setupFunction()
     temp = "IP=" + WiFi.localIP().toString();
     lcd.print(temp);
     delay(3500);
+   
     //*************************lcd***************************
   }
   //---------------------------------------------------------------------------------------

@@ -13,14 +13,14 @@ void kontr_temp()
   Serial.println();
   Serial.println();
   if (EEPROM.read(EEPROM_ADRESS_CLIENT_OR_ACCESS_POINT) > 0)getDate = GetDate::getDateTime(); // client
-//  printObjectTime();
+  printObjectTime();
 
   //  Sensor::readSensorsAddressTemp(ds18b20); //читаємо в обєкт DS18B20 адреса і температуру датчиків що є підключенні до контроллера
   //  Sensor::readEepromDataSensor(ds18b20EEprom); //читаємо імя, address і температуру з памяті ЕЕПРОМ  в обєкт ds18b20EEprom що є вибрані в програмі
   //  Sensor::searchCodeSennsorInEEPROM(ds18b20EEprom, ds18b20);//Записуємо температуру в EEPROM sensory з реальних датчиків
 
 
-  if(!disableScanerSensors)Sensor::sendSensorData(ds18b20EEprom, ds18b20);//при нажиманні на кнопки віключаємо сканування сенсора
+  if (!disableScanerSensors)Sensor::sendSensorData(ds18b20EEprom, ds18b20); //при нажиманні на кнопки віключаємо сканування сенсора
 
   //  Serial.print("nameSensor ");
   //  Serial.print(ds18b20EEprom[0].nameSensor);
@@ -44,9 +44,9 @@ void kontr_temp()
         ChangeLow = 0;
         ChangeHIGH = 1;
       }
-//      prin("releControl[numberRele].numberSensorControl", releControl[numberRele].numberSensorControl);
+      //      prin("releControl[numberRele].numberSensorControl", releControl[numberRele].numberSensorControl);
       //********************Реверс реле**************************************************************************
-//      prin("releNumber", numberRele);
+      //      prin("releNumber", numberRele);
       //      prin("releControl[numberRele].numberSensorControl", releControl[numberRele].getNumberSensorControlEEPROM(numberRele) );
       //********************CONTROL TERMO SENSOR************************
       if ( releControl[numberRele].getNumberSensorControlEEPROM(numberRele) < 255 )//Якщо керуємо термодатчиком то в змінну буле записано номер термодатчика від 0 до 8 замість числа 15 - неуправляємо нічим
@@ -87,15 +87,19 @@ void kontr_temp()
 
         if (dataAndTime[numberRele].data_datamiliseconds[numberDataTime] != 4294967295  &&  dataAndTime[numberRele].godyna[numberDataTime * 5] < 24)//Якщо в секції вибрано і  дата і година
         {
-          //          prin("NUMBER RELE selesct data and time", numberRele);
-          //          prin("controlRangeDate(numberRele, numberDataTime)", controlRangeDate(numberRele, numberDataTime));
-          //          prin("GetDate::controlRangeHour(getDate, numberRele, numberDataTime)", GetDate::controlRangeHour(getDate, numberRele, numberDataTime));
+//          prin("NUMBER RELE selesct data and time", numberRele);
+//          prin("data and time");
 
-          timersFlagSections[numberDataTime / 2] = controlRangeDate(numberRele, numberDataTime) && GetDate::controlRangeHour(getDate, numberRele, numberDataTime);
+
+          timersFlagSections[numberDataTime / 2] = GetDate::controlRangeDate(getDate, numberRele, numberDataTime) && GetDate::controlRangeHour(getDate, numberRele, numberDataTime);
 
         } else if (dataAndTime[numberRele].data_datamiliseconds[numberDataTime] != 4294967295)//Якщо в секції вибрана дата
         {
-          timersFlagSections[numberDataTime / 2] = controlRangeDate(numberRele, numberDataTime);
+//          prin("NUMBER RELE selesct data and time", numberRele);
+//          prin("data");
+//          prin("controlRangeDate(numberRele, numberDataTime)", GetDate::controlRangeDate(getDate, numberRele, numberDataTime));
+//          prin("GetDate::controlRangeHour(getDate, numberRele, numberDataTime)", GetDate::controlRangeDate(getDate, numberRele, numberDataTime));
+          timersFlagSections[numberDataTime / 2] = GetDate::controlRangeDate(getDate, numberRele, numberDataTime);
         } else if (dataAndTime[numberRele].godyna[numberDataTime * 5] != 99) //Якщо в секції вибрана година
         {
           //          prin("GetDate::controlRangeHour(getDate, numberRele, numberDataTime );", GetDate::controlRangeHour(getDate, numberRele, numberDataTime ));
@@ -124,7 +128,7 @@ void kontr_temp()
                                              dataAndTime[numberRele].godyna[40] < 24;
       //**********************************************************************************
 
-//      prin("releControl[numberRele].timerControl", releControl[numberRele].timerControl);
+      //      prin("releControl[numberRele].timerControl", releControl[numberRele].timerControl);
 
 
 
@@ -140,10 +144,10 @@ void kontr_temp()
       //********************CONTROL FLAGS*******************************
       if (releControl[numberRele].numberSensorControl < 255 && releControl[numberRele].timerControl == 1)   //Якщо реле регул двома
       {
-//        Serial.println("CONTROL  TIME AND SENSOR::::::::::::  ");
-//        Serial.println("numberSensorControl::::::::::::  ");
-//        Serial.println(releControl[numberRele].numberSensorControl);
-//        Serial.println("CONTROL  TIME AND SENSOR::::::::::::  ");
+        //        Serial.println("CONTROL  TIME AND SENSOR::::::::::::  ");
+        //        Serial.println("numberSensorControl::::::::::::  ");
+        //        Serial.println(releControl[numberRele].numberSensorControl);
+        //        Serial.println("CONTROL  TIME AND SENSOR::::::::::::  ");
 
         if (!releControl[numberRele].errorSensor  && connectedInternet) {// Якщо датчик присутній  і є година з інтернету
           if (releControl[numberRele].flagsTermo &&  releControl[numberRele].flagsTimer) {
@@ -159,7 +163,7 @@ void kontr_temp()
         }
 
       } else if (releControl[numberRele].numberSensorControl < 255) {   //Якщо реле регул termo
-//        Serial.println("CONTROL  SENSOR ::::::::::::  ");
+        //        Serial.println("CONTROL  SENSOR ::::::::::::  ");
 
         if (!releControl[numberRele].errorSensor) {// Якщо датчик присутній
           if (releControl[numberRele].flagsTermo) {
@@ -175,8 +179,8 @@ void kontr_temp()
         }
       } else if (releControl[numberRele].timerControl == 1) {   //Якщо реле регул timer
         if (connectedInternet) {// Якщо є година з інтернету
-//          Serial.println("CONTROL  TIME ::::::::::::  ");
-//          prin("releControl[numberRele].flagsTimer", releControl[numberRele].flagsTimer);
+          //          Serial.println("CONTROL  TIME ::::::::::::  ");
+          //          prin("releControl[numberRele].flagsTimer", releControl[numberRele].flagsTimer);
           if (releControl[numberRele].flagsTimer) {
             digitalWrite(releControl[numberRele].numberPin, ChangeLow);
           } else {
@@ -189,7 +193,7 @@ void kontr_temp()
             digitalWrite(releControl[numberRele].numberPin, ChangeHIGH);
         }
       } else { //Якщо реле нічого не регулює то ми його відключаємо
-//        Serial.println("NOT CONTROL RELE ::::::::::::  ");
+        //        Serial.println("NOT CONTROL RELE ::::::::::::  ");
         digitalWrite(releControl[numberRele].numberPin, 1);
       }
       //********************CONTROL FLAGS*******************************

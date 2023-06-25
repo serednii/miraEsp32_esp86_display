@@ -40,8 +40,8 @@ void callback(const MQTT::Publish &pub) //було
   {
     Serial.print("GET mesage setDefineDevice  ----  ");
     //    Serial.println(payload);
-    sendPostRequest();
-    sendGetRequest();
+    //    sendPostRequest();
+    //    sendGetRequest();
     OtherFunction::defineDevice();//Приводимо в початковий стан всі змінні
   }
   //*************************************************************************************************************************************************
@@ -76,91 +76,8 @@ void callback(const MQTT::Publish &pub) //було
   //*************************************************************************************************************************************************
   if (String(pub.topic()) == nameUser + "_start-data-sensor-eepromAndDevice") //при запросі відправити в топік адреса EEPROM i реальних датчиків
   {
-    //    prin("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx0000000000000000000000000");
-    //    refreshData();
-    //    kontr_temp();
-
-    //-------------------------------------------------------------------------
-
-    if (payload == "ReadDate" || payload == "ALL") //NO
-    {
-      prin("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%$$$$$$$$$$$$$$$$$$$$$$$$$");
-      prin(String(sizeof(TimerDate)));
-      TimerDate::readTimerEEPROMToObjeckt(dataAndTime);
-      client.publish(nameUser + "_esp_to_brouser_rele_data_time_all", TimerDate::objectToJsonDateArray(dataAndTime));
-      //    prin(TimerDate::sendDateTime(dataAndTime));
-      //    prin("TimerDate::sendDateTime(dataAndTime) 111111111111111111111");
-    }
-
-    //****************************************************************************************************
-
-    if (payload == "readAddressSensor" || payload == "ALL") //OK
-    {
-      Sensor::sendSensorData(ds18b20EEprom, ds18b20);
-      //{"obj":[{"number": 0, "address": "0000000000000000", "temp": 0.00}]}
-      //{"obj":[{"number": 0, "address": "28ff6402e248ff11", "temp": 24.50}]}
-      //      prin("readAddressSensor WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
-    }
-
-    //****************************************************************************************************
-    //    if (payload == "NameSensor" || payload == "ALL")  //На видалення дані передаються через readAddressSensor  Sensor::sendSensorData(ds18b20EEprom, ds18b20);
-    //    {
-    //                client.publish(nameUser + "_sensor-name", ds18b20EEpromToJSONnameSensor());
-    //      // {"obj":[{"nameSensor": "cherpadl"},{"nameSensor": "kuxyn"},{"nameSensor": "sddff"},{"nameSensor": "name4"},{"nameSensor": "name5"},{"nameSensor": "name6"},{"nameSensor": ""},{"nameSensor": ""}]}
-    //      //      prin("NameSensor WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
-    //    }
-
-    //-------------------------------------------------------------------------
-
-    if (payload == "ReadTempVklOtkl" || payload == "ALL")
-    {
-      client.publish(nameUser + "_sensor-vkl-otkl", Rele::releOnOffEEPROMDataToJSON()); // send temp on temp off
-      //      {"obj":[{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30}]}
-      //      prin("Rele::releOnOffEEPROMDataToJSON WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
-      //      prin(Rele::releOnOffEEPROMDataToJSON());
-    }
-
-    //****************************************************************************************************
-
-    if (payload == "ReleManual" || payload == "ALL")
-    {
-      //      client.publish(nameUser + "_rele-out-eprom_upr-manual", Rele::sendEEPROMDataToJSONSensor()); //send name rele
-      Rele::sendStanReleManualAuto(releControl);
-      //{"obj":[{"namberRele": 0},{"namberRele": 0},{"namberRele": 0},{"namberRele": 1},{"namberRele": 0},{"namberRele": 1},{"namberRele": 1},{"namberRele": 0}]}
-      prin("ReleManual WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
-      prin("**********************", Rele::objectToJSONRele(releControl));
-    }
-
-    //****************************************************************************************************
-
-    if (payload == "releControl" || payload == "ALL")
-    {
-      Rele::sendEEPROMDataToJSONSensor();
-      //            client.publish(nameUser + "_rele_eprom_upr", Rele::sendEEPROMDataToJSONSensor());//Номер термодатчика який керує реле
-      // {"obj":[{"number": 255},{"number": 255},{"number": 255},{"number": 255},{"number": 255},{"number": 255},{"number": 255},{"number": 255}]}
-      //      prin("releControl RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
-      //      prin(Rele::sendEEPROMDataToJSONSensor());
-      //      prin("releControl RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
-    }
-
-    //****************************************************************************************************
-
-
-
-    if (payload == "NameRele" || payload == "ALL")
-    {
-      client.publish(nameUser + "_rele-name", Rele::objectToJSONRele(releControl));//send name rele
-      prin("NameRele WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
-      Serial.println(nameUser + "_rele-name  ---- ");
-      Serial.println(Rele::objectToJSONRele(releControl));
-    }
+    if (payload == "ALL") outAllDataOnServer();
   }
-  //****************************************************************************************************
-  //****************************************************************************************************
-
-
-
-
 
   //*************************************************************************************************************************************************
 
@@ -236,7 +153,7 @@ void callback(const MQTT::Publish &pub) //було
 
     int a = _currentRelay * 2 + START_SECTION_EEPROM_TEMP_ON_OFF;
 
-    EEPROM.write(a, tempVkl + 50);//50 зміщеннф температури в  байті на 50 одиниць в гору приходило було (-50 до +125) а зберігаємо в байті від (0 - 175) 
+    EEPROM.write(a, tempVkl + 50);//50 зміщеннф температури в  байті на 50 одиниць в гору приходило було (-50 до +125) а зберігаємо в байті від (0 - 175)
     EEPROM.write(a + 1, tempOtkl + 50);
     Eeprom::comitEprom();
     refreshData();
@@ -373,3 +290,103 @@ void callback(const MQTT::Publish &pub) //було
 
 }
 //*************************************************************************************************************************************************
+
+
+
+
+
+
+void outAllDataOnServer() {
+  TimerDate::readTimerEEPROMToObjeckt(dataAndTime);
+  client.publish(nameUser + "_esp_to_brouser_rele_data_time_all", TimerDate::objectToJsonDateArray(dataAndTime));
+  Sensor::sendSensorData(ds18b20EEprom, ds18b20);
+  client.publish(nameUser + "_sensor-vkl-otkl", Rele::releOnOffEEPROMDataToJSON()); // send temp on temp off
+  Rele::sendStanReleManualAuto(releControl);
+  Rele::sendEEPROMDataToJSONSensor();
+  client.publish(nameUser + "_rele-name", Rele::objectToJSONRele(releControl));//send name rele
+  prin("NameRele WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+  Serial.println(nameUser + "_rele-name  ---- ");
+  Serial.println(Rele::objectToJSONRele(releControl));
+}
+
+
+
+
+
+
+
+
+//
+//
+// if (payload == "ReadDate" || payload == "ALL") //NO
+//    {
+//      prin("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%$$$$$$$$$$$$$$$$$$$$$$$$$");
+//      prin(String(sizeof(TimerDate)));
+//      TimerDate::readTimerEEPROMToObjeckt(dataAndTime);
+//      client.publish(nameUser + "_esp_to_brouser_rele_data_time_all", TimerDate::objectToJsonDateArray(dataAndTime));
+//      //    prin(TimerDate::sendDateTime(dataAndTime));
+//      //    prin("TimerDate::sendDateTime(dataAndTime) 111111111111111111111");
+//    }
+//
+//    //****************************************************************************************************
+//
+//    if (payload == "readAddressSensor" || payload == "ALL") //OK
+//    {
+//      Sensor::sendSensorData(ds18b20EEprom, ds18b20);
+//      //{"obj":[{"number": 0, "address": "0000000000000000", "temp": 0.00}]}
+//      //{"obj":[{"number": 0, "address": "28ff6402e248ff11", "temp": 24.50}]}
+//      //      prin("readAddressSensor WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+//    }
+//
+//    //****************************************************************************************************
+//    //    if (payload == "NameSensor" || payload == "ALL")  //На видалення дані передаються через readAddressSensor  Sensor::sendSensorData(ds18b20EEprom, ds18b20);
+//    //    {
+//    //                client.publish(nameUser + "_sensor-name", ds18b20EEpromToJSONnameSensor());
+//    //      // {"obj":[{"nameSensor": "cherpadl"},{"nameSensor": "kuxyn"},{"nameSensor": "sddff"},{"nameSensor": "name4"},{"nameSensor": "name5"},{"nameSensor": "name6"},{"nameSensor": ""},{"nameSensor": ""}]}
+//    //      //      prin("NameSensor WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+//    //    }
+//
+//    //-------------------------------------------------------------------------
+//
+//    if (payload == "ReadTempVklOtkl" || payload == "ALL")
+//    {
+//      client.publish(nameUser + "_sensor-vkl-otkl", Rele::releOnOffEEPROMDataToJSON()); // send temp on temp off
+//      //      {"obj":[{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30},{"vkl": 25,"otkl": 30}]}
+//      //      prin("Rele::releOnOffEEPROMDataToJSON WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+//      //      prin(Rele::releOnOffEEPROMDataToJSON());
+//    }
+//
+//    //****************************************************************************************************
+//
+//    if (payload == "ReleManual" || payload == "ALL")
+//    {
+//      //      client.publish(nameUser + "_rele-out-eprom_upr-manual", Rele::sendEEPROMDataToJSONSensor()); //send name rele
+//      Rele::sendStanReleManualAuto(releControl);
+//      //{"obj":[{"namberRele": 0},{"namberRele": 0},{"namberRele": 0},{"namberRele": 1},{"namberRele": 0},{"namberRele": 1},{"namberRele": 1},{"namberRele": 0}]}
+//      prin("ReleManual WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+//      prin("**********************", Rele::objectToJSONRele(releControl));
+//    }
+//
+//    //****************************************************************************************************
+//
+//    if (payload == "releControl" || payload == "ALL")
+//    {
+//      Rele::sendEEPROMDataToJSONSensor();
+//      //            client.publish(nameUser + "_rele_eprom_upr", Rele::sendEEPROMDataToJSONSensor());//Номер термодатчика який керує реле
+//      // {"obj":[{"number": 255},{"number": 255},{"number": 255},{"number": 255},{"number": 255},{"number": 255},{"number": 255},{"number": 255}]}
+//      //      prin("releControl RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
+//      //      prin(Rele::sendEEPROMDataToJSONSensor());
+//      //      prin("releControl RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
+//    }
+//
+//    //****************************************************************************************************
+//
+//
+//
+//    if (payload == "NameRele" || payload == "ALL")
+//    {
+//      client.publish(nameUser + "_rele-name", Rele::objectToJSONRele(releControl));//send name rele
+//      prin("NameRele WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+//      Serial.println(nameUser + "_rele-name  ---- ");
+//      Serial.println(Rele::objectToJSONRele(releControl));
+//    }
